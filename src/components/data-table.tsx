@@ -1,12 +1,10 @@
 import {
-  ColumnDef,
+  createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import cn from "classnames";
 
 export type ChannelInfo = {
   id: string;
@@ -17,99 +15,52 @@ export type ChannelInfo = {
   shortChannelId: string;
 };
 
-const data: ChannelInfo[] = [
-  {
-    id: "m5gr84i9",
-    pubkey: "1234567890",
-    alias: "hello",
-    disabled: false,
-    capacity: 316,
-    shortChannelId: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    alias: "hello",
-    pubkey: "1234567890",
-    disabled: false,
-    capacity: 242,
-    shortChannelId: "ken99@yahoo.com",
-  },
-  {
-    id: "derv1ws0",
-    alias: "hello",
-    pubkey: "1234567890",
-    disabled: false,
-    capacity: 837,
-    shortChannelId: "ken99@yahoo.com",
-  },
-  {
-    id: "5kma53ae",
-    alias: "hello",
-    pubkey: "1234567890",
-    disabled: false,
-    capacity: 874,
-    shortChannelId: "ken99@yahoo.com",
-  },
-  {
-    id: "bhqecj4p",
-    alias: "hello",
-    pubkey: "1234567890",
-    disabled: false,
-    capacity: 721,
-    shortChannelId: "ken99@yahoo.com",
-  },
-];
+const columnHelper = createColumnHelper<ChannelInfo>();
 
-export const columns: ColumnDef<ChannelInfo>[] = [
-  {
-    accessorKey: "alias",
+export const columns = [
+  columnHelper.accessor("alias", {
     header: "Alias",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("alias")}</div>
+    cell: (info) => <div className="capitalize">{info.getValue()}</div>,
+  }),
+  columnHelper.accessor("pubkey", {
+    header: "Public Key",
+    cell: (info) => (
+      <div className="capitalize">{info.getValue().slice(0, 20) + "..."}</div>
     ),
-  },
-  {
-    accessorKey: "pubkey",
-    header: "PubKey",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("pubkey")}</div>
-    ),
-  },
-  {
-    accessorKey: "disabled",
+  }),
+  columnHelper.accessor("disabled", {
     header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">
-        {JSON.stringify(row.getValue("disabled"))}
+    cell: (info) => (
+      <div className="capitalize">{JSON.stringify(info.getValue())}</div>
+    ),
+  }),
+
+  columnHelper.accessor("shortChannelId", {
+    header: "Channel ID",
+    cell: (info) => <div className="lowercase">{info.getValue()}</div>,
+  }),
+  columnHelper.accessor("capacity", {
+    header: "Capacity",
+    cell: (info) => (
+      <div className="text-right font-medium">
+        {JSON.stringify(info.getValue())}
       </div>
     ),
-  },
-  {
-    accessorKey: "shortChannelId",
-    header: () => "Channel ID",
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("shortChannelId")}</div>
-    ),
-  },
-  {
-    accessorKey: "capacity",
-    header: () => <div className="text-right">Capacity</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-right font-medium">{row.getValue("capacity")}</div>
-      );
-    },
-  },
+  }),
 ];
 
-export function DataTable() {
+type DataTableProps = {
+  data: ChannelInfo[] | undefined;
+  isLoading: boolean;
+};
+
+const emptyArray: ChannelInfo[] = [];
+
+export function DataTable({ data, isLoading }: DataTableProps) {
   const table = useReactTable({
-    data,
+    data: data || emptyArray,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
@@ -118,10 +69,15 @@ export function DataTable() {
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers.map((header, index) => {
                 return (
                   <th
-                    className="font-medium text-white text-left py-3 text-lg"
+                    className={cn(
+                      "font-medium text-white py-3 text-lg",
+                      headerGroup.headers.length - 1 === index
+                        ? "text-right"
+                        : "text-left"
+                    )}
                     key={header.id}
                   >
                     {header.isPlaceholder
@@ -136,9 +92,9 @@ export function DataTable() {
             </tr>
           ))}
         </thead>
-        <tbody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+        {!isLoading && (
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="text-slate-300 py-2 w-40">
@@ -146,38 +102,50 @@ export function DataTable() {
                   </td>
                 ))}
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </td>
-            </tr>
-          )}
-        </tbody>
+            ))}
+          </tbody>
+        )}
+        {isLoading && (
+          <tbody>
+            {[...new Array(10)].map((_, index) => (
+              <tr
+                key={index}
+                className={
+                  index % 2 === 0
+                    ? "animate-pulse bg-slate-600"
+                    : "animate-pulse bg-slate-700"
+                }
+              >
+                {[...new Array(5)].map((_, index) => (
+                  <td key={index} className="w-40 my-2 h-10" />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        )}
       </table>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-white">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <button
-            className="text-white"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </button>
-          <button
-            className="text-white"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      {/* <div className="flex items-center justify-end space-x-2 py-4"> */}
+      {/*   <div className="flex-1 text-sm text-white"> */}
+      {/*     {table.getFilteredSelectedRowModel().rows.length} of{" "} */}
+      {/*     {table.getFilteredRowModel().rows.length} row(s) selected. */}
+      {/*   </div> */}
+      {/*   <div className="space-x-2"> */}
+      {/*     <button */}
+      {/*       className="text-white" */}
+      {/*       onClick={() => table.previousPage()} */}
+      {/*       disabled={!table.getCanPreviousPage()} */}
+      {/*     > */}
+      {/*       Previous */}
+      {/*     </button> */}
+      {/*     <button */}
+      {/*       className="text-white" */}
+      {/*       onClick={() => table.nextPage()} */}
+      {/*       disabled={!table.getCanNextPage()} */}
+      {/*     > */}
+      {/*       Next */}
+      {/*     </button> */}
+      {/*   </div> */}
+      {/* </div> */}
     </div>
   );
 }
