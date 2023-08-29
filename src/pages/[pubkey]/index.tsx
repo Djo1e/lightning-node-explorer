@@ -17,9 +17,9 @@ function formatLastUpdate(lastUpdate: string | undefined) {
 
 export default function Pubkey() {
   const router = useRouter();
-  const { pubkey } = router.query;
+  const { pubkey } = router.query as { pubkey: string };
 
-  const { data, isLoading } = useChannelList();
+  const { data, isLoading } = useChannelList(pubkey);
   const { totalCapacity, numChannels, lastUpdate, channels, alias } =
     data || {};
 

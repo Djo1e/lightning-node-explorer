@@ -43,6 +43,11 @@ export type Data = {
   };
 };
 
+type ErrorType = {
+  errors: { message: string; path: string[]; extension: { code: string } }[];
+};
+type ResponseType = Data | ErrorType;
+
 function mapApiResponse(data: Data): ChannelInfoResponse {
   const list = data.data.getNode.graph_info.channels.channel_list.list;
   const channels = list.map((item) => {
@@ -68,8 +73,12 @@ function mapApiResponse(data: Data): ChannelInfoResponse {
   };
 }
 
-export default async function handler(_: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
+  const { pubkey } = req.query;
 
   const query = `
     query Pagination($pubkey: String!, $page: PageInput, $order: OrderChannelInput) {
@@ -114,8 +123,7 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
   `;
 
   const variables = {
-    pubkey:
-      "03a1f3afd646d77bdaf545cceaf079bab6057eae52c6319b63b5803d0989d6a72f",
+    pubkey,
     page: {
       limit: 10,
       offset: 0,
@@ -137,7 +145,14 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
       }),
     });
 
-    const data = (await response.json()) as Data;
+    const data: ResponseType = await response.json();
+
+    if ("errors" in data) {
+      return res.status(500).json({
+        message: data.errors[0].message,
+      });
+    }
+
     res.status(200).json(mapApiResponse(data));
   } catch (error) {
     console.error(error);
