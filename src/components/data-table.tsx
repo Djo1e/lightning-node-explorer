@@ -5,6 +5,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import cn from "classnames";
+import { StatusChip } from "./status-chip";
 
 export type ChannelInfo = {
   id: string;
@@ -13,6 +14,13 @@ export type ChannelInfo = {
   disabled: boolean;
   capacity: number;
   shortChannelId: string;
+};
+
+export type ChannelInfoResponse = {
+  channels: ChannelInfo[];
+  numChannels: number;
+  totalCapacity: string;
+  lastUpdate: string;
 };
 
 const columnHelper = createColumnHelper<ChannelInfo>();
@@ -30,9 +38,14 @@ export const columns = [
   }),
   columnHelper.accessor("disabled", {
     header: "Status",
-    cell: (info) => (
-      <div className="capitalize">{JSON.stringify(info.getValue())}</div>
-    ),
+    cell: (info) => {
+      const disabled = info.getValue();
+      return (
+        <StatusChip variant={disabled ? "error" : "success"}>
+          {disabled ? "Inactive" : "Active"}
+        </StatusChip>
+      );
+    },
   }),
 
   columnHelper.accessor("shortChannelId", {
@@ -97,7 +110,7 @@ export function DataTable({ data, isLoading }: DataTableProps) {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="text-slate-300 py-2 w-40">
+                  <td key={cell.id} className="text-slate-300 py-3 w-40">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

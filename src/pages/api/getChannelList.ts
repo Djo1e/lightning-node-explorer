@@ -1,4 +1,4 @@
-import { ChannelInfo } from "@/components/data-table";
+import { ChannelInfo, ChannelInfoResponse } from "@/components/data-table";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Data = {
@@ -31,15 +31,18 @@ export type Data = {
               short_channel_id: string;
             }[];
           };
+          total_capacity: string;
+          num_channels: number;
         };
+        last_update: string;
       };
     };
   };
 };
 
-function mapApiResponse(data: Data): ChannelInfo[] {
+function mapApiResponse(data: Data): ChannelInfoResponse {
   const list = data.data.getNode.graph_info.channels.channel_list.list;
-  return list.map((item) => {
+  const channels = list.map((item) => {
     const {
       node1_pub,
       node2_pub,
@@ -58,6 +61,13 @@ function mapApiResponse(data: Data): ChannelInfo[] {
       shortChannelId: short_channel_id,
     };
   });
+
+  return {
+    channels,
+    numChannels: data.data.getNode.graph_info.channels.num_channels,
+    totalCapacity: data.data.getNode.graph_info.channels.total_capacity,
+    lastUpdate: data.data.getNode.graph_info.last_update,
+  };
 }
 
 export default async function handler(_: NextApiRequest, res: NextApiResponse) {
@@ -93,7 +103,10 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
                 }
               }
             }
+            total_capacity
+            num_channels
           }
+          last_update
         }
       }
     }
