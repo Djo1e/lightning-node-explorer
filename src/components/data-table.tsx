@@ -1,3 +1,4 @@
+import { formatCapacity } from "@/lib/utils";
 import {
   createColumnHelper,
   flexRender,
@@ -5,6 +6,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import cn from "classnames";
+import Link from "next/link";
 import { StatusChip } from "./status-chip";
 
 export type ChannelInfo = {
@@ -21,6 +23,7 @@ export type ChannelInfoResponse = {
   numChannels: number;
   totalCapacity: string;
   lastUpdate: string;
+  alias: string;
 };
 
 const columnHelper = createColumnHelper<ChannelInfo>();
@@ -28,7 +31,14 @@ const columnHelper = createColumnHelper<ChannelInfo>();
 export const columns = [
   columnHelper.accessor("alias", {
     header: "Alias",
-    cell: (info) => <div className="capitalize">{info.getValue()}</div>,
+    cell: (info) => (
+      <Link
+        className="capitalize text-indigo-400 underline hover:text-indigo-500"
+        href={`/${info.row.original.pubkey}`}
+      >
+        {info.getValue()}
+      </Link>
+    ),
   }),
   columnHelper.accessor("pubkey", {
     header: "Public Key",
@@ -55,8 +65,8 @@ export const columns = [
   columnHelper.accessor("capacity", {
     header: "Capacity",
     cell: (info) => (
-      <div className="text-right font-medium">
-        {JSON.stringify(info.getValue())}
+      <div className="text-right whitespace-nowrap font-medium">
+        {formatCapacity(info.getValue())}
       </div>
     ),
   }),
