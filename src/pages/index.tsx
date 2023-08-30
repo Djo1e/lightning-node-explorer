@@ -17,12 +17,12 @@ export default function Home() {
   }
 
   return (
-    <main className="px-4">
+    <main className="px-4 py-20 sm:pt-40">
       <form
         className="relative flex justify-center items-center flex-col max-w-md mx-auto sm:max-w-xl md:max-w-2xl 2xl:max-w-4xl"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-white text-3xl [@media(min-width:400px)]:text-4xl font-semibold pt-20 sm:pt-40 text-center">
+        <h1 className="text-white text-3xl [@media(min-width:400px)]:text-4xl font-semibold text-center">
           Explore the Lightning network&nbsp;⚡
         </h1>
         <MainSearch value={search} setValue={(value) => setSearch(value)} />

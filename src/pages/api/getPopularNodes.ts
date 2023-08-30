@@ -1,3 +1,5 @@
+import { GRAPHQL_ENDPOINT } from "@/lib/constants";
+import { getPopularNodesQuery } from "@/lib/queries/get-popular-nodes";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Data = {
@@ -12,14 +14,6 @@ type ErrorType = {
 type ResponseType = Data | ErrorType;
 
 export default async function handler(_: NextApiRequest, res: NextApiResponse) {
-  const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
-
-  const query = `
-    query GetPopularNodes {
-      getPopularNodes
-    }
-  `;
-
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: "POST",
@@ -27,7 +21,7 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: getPopularNodesQuery,
       }),
     });
 

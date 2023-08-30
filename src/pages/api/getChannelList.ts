@@ -1,4 +1,6 @@
 import { ChannelInfoResponse, PAGE_SIZE } from "@/components/data-table";
+import { GRAPHQL_ENDPOINT } from "@/lib/constants";
+import { GetChannelListQuery } from "@/lib/queries/get-channel-list";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Data = {
@@ -73,53 +75,10 @@ function mapApiResponse(data: Data): ChannelInfoResponse {
   };
 }
 
-const query = `
-    query Pagination($pubkey: String!, $page: PageInput, $order: OrderChannelInput) {
-      getNode(pubkey: $pubkey) {
-        graph_info {
-          channels {
-            channel_list(page: $page, order: $order) {
-              pagination {
-                limit
-                offset
-              }
-              list {
-                block_age
-                capacity
-                chan_point
-                last_update
-                last_update_date
-                long_channel_id
-                node1_pub
-                node2_pub
-                short_channel_id
-                node2_policy {
-                  disabled
-                }
-                node2_info {
-                  node {
-                    alias
-                  }
-                }
-              }
-            }
-            total_capacity
-            num_channels
-          }
-          last_update
-          node {
-            alias
-          }
-        }
-      }
-    }
-  `;
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
   const { pubkey, pageIndex } = req.query as unknown as {
     pubkey: string;
     pageIndex: string;
@@ -145,7 +104,7 @@ export default async function handler(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: GetChannelListQuery,
         variables,
       }),
     });

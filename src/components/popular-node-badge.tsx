@@ -17,10 +17,12 @@ export function PopularNodeBadge({ pubkey }: PopularNodeBadge) {
         { "animate-pulse": isLoading }
       )}
     >
-      {data?.nodeInfo.alias}
-      <span className="text-slate-600 font-normal mt-0.5 text-xs">
-        {data?.nodeInfo?.numChannels} channels
-      </span>
+      {data?.nodeInfo?.alias}
+      {!isLoading && (
+        <span className="text-slate-600 font-normal mt-0.5 text-xs">
+          {data?.nodeInfo?.numChannels} channels
+        </span>
+      )}
     </Link>
   );
 }

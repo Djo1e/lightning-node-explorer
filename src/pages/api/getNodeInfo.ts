@@ -1,3 +1,5 @@
+import { GRAPHQL_ENDPOINT } from "@/lib/constants";
+import { getNodeInfoQuery } from "@/lib/queries/get-node-info";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Data = {
@@ -22,7 +24,7 @@ type ErrorType = {
 };
 type ResponseType = Data | ErrorType;
 export type GetNodeInfoResponseType = {
-  nodeInfo: ReturnType<typeof mapApiResponse>;
+  nodeInfo: ReturnType<typeof mapApiResponse> | undefined;
 };
 
 function mapApiResponse(data: Data) {
@@ -36,29 +38,10 @@ function mapApiResponse(data: Data) {
   };
 }
 
-const query = `
-    query GetNode($pubkey: String!) {
-      getNode(pubkey: $pubkey) {
-        graph_info {
-          channels {
-            num_channels
-            total_capacity
-          }
-          last_update
-          node {
-            alias
-            pub_key
-          }
-        }
-      }
-    }
-  `;
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
   const pubkey = req.query.pubkey;
 
   try {
@@ -68,7 +51,7 @@ export default async function handler(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: getNodeInfoQuery,
         variables: { pubkey },
       }),
     });
