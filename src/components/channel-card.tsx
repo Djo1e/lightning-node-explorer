@@ -7,12 +7,12 @@ type ChannelCardProps = {
 export function ChannelCard({ value, label, isLoading }: ChannelCardProps) {
   if (isLoading) {
     return (
-      <div className="w-1/3 bg-slate-300/90 h-44 flex flex-col justify-center rounded shadow-lg shadow-slate-700 animate-pulse" />
+      <div className="w-full bg-slate-300/90 h-44 flex flex-col justify-center rounded shadow-lg shadow-slate-700 animate-pulse" />
     );
   }
 
   return (
-    <div className="w-1/3 bg-slate-300/90 h-44 flex flex-col justify-center rounded shadow-lg shadow-slate-700">
+    <div className="w-full px-2 bg-slate-300/90 h-44 flex flex-col justify-center rounded shadow-lg shadow-slate-700">
       <p className="text-center capitalize font-bold text-3xl text-blue-600">
         {value}
       </p>

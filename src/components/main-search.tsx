@@ -5,7 +5,7 @@ type MainSearchProps = {
 
 export function MainSearch({ value, setValue }: MainSearchProps) {
   return (
-    <div className="relative flex flex-col mt-10 w-full sm:flex-row sm:w-1/2">
+    <div className="relative flex flex-col mt-10 sm:mt-16 w-full sm:flex-row">
       <div className="relative w-full">
         <input
           className="w-full text-lg text-slate-900 px-4 sm:pl-12 rounded sm:rounded-r-none py-2 border"

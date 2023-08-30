@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import cn from "classnames";
+import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ArrowLeftIcon } from "./icons/arrow-left";
@@ -36,10 +36,10 @@ export const columns = [
     header: "Alias",
     cell: (info) => (
       <Link
-        className="capitalize text-indigo-400 underline hover:text-indigo-500"
+        className="capitalize whitespace-nowrap text-indigo-400 underline hover:text-indigo-500"
         href={`/${info.row.original.pubkey}`}
       >
-        {info.getValue()}
+        {info.getValue() || "N/A"}
       </Link>
     ),
   }),
@@ -111,65 +111,79 @@ export function DataTable({ data, isLoading }: DataTableProps) {
 
   return (
     <div className="w-full">
-      <table className="w-full">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header, index) => {
-                return (
-                  <th
-                    className={cn(
-                      "font-medium text-white py-3 text-lg",
-                      headerGroup.headers.length - 1 === index
-                        ? "text-right"
-                        : "text-left"
-                    )}
-                    key={header.id}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        {!isLoading && (
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="text-slate-300 py-3 w-40">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-full">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header, index) => {
+                  const isLastIndex = index === headerGroup.headers.length - 1;
+                  return (
+                    <th
+                      className={classNames(
+                        "font-medium text-white p-3 text-lg",
+                        isLastIndex ? "text-right" : "text-left",
+                        {
+                          "pl-0": index === 0,
+                          "pr-0": isLastIndex,
+                        }
+                      )}
+                      key={header.id}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
-          </tbody>
-        )}
-        {isLoading && (
-          <tbody>
-            {[...new Array(10)].map((_, index) => (
-              <tr
-                key={index}
-                className={
-                  index % 2 === 0
-                    ? "animate-pulse bg-slate-600"
-                    : "animate-pulse bg-slate-700"
-                }
-              >
-                {[...new Array(5)].map((_, index) => (
-                  <td key={index} className="w-40 my-2 h-12" />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        )}
-      </table>
+          </thead>
+          {!isLoading && (
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell, index) => (
+                    <td
+                      key={cell.id}
+                      className={classNames("text-slate-300 p-3 w-40", {
+                        "pl-0": index === 0,
+                        "pr-0": index === row.getVisibleCells().length - 1,
+                      })}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+          {isLoading && (
+            <tbody>
+              {[...new Array(10)].map((_, index) => (
+                <tr
+                  key={index}
+                  className={
+                    index % 2 === 0
+                      ? "animate-pulse bg-slate-600"
+                      : "animate-pulse bg-slate-700"
+                  }
+                >
+                  {[...new Array(5)].map((_, index) => (
+                    <td key={index} className="min-w-[10rem] w-40 my-2 h-12" />
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
       <div className="flex items-center text-md justify-end space-x-2 py-8">
         <div className="flex-1 text-white">Page {page + 1}</div>
         <div className="flex items-center space-x-6">
