@@ -62,7 +62,7 @@ export default function Pubkey() {
         {isLoading ? (
           <div className="h-8 my-1 w-3/4 xs:1/2 sm:w-36 bg-slate-500 animate-pulse" />
         ) : (
-          <h1 className="text-white font-semibold text-4xl">
+          <h1 className="text-white font-semibold break-words text-4xl">
             {alias || "N/A"}
           </h1>
         )}

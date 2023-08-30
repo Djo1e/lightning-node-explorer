@@ -97,6 +97,7 @@ export default async function handler(
       direction: "ASC",
     },
   };
+
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: "POST",

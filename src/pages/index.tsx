@@ -3,6 +3,7 @@ import { MainSearch } from "@/components/main-search";
 import { usePopularNodes } from "@/lib/api/use-popular-nodes";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const router = useRouter();
@@ -39,11 +40,27 @@ export default function Home() {
 
             <div className="grid grid-cols-1 [@media(min-width:480px)]:grid-cols-2 justify-items-center sm:grid-cols-3 w-full px-4 mt-2 gap-x-6 gap-y-2">
               {popularNodes.slice(0, 3).map((pubkey) => (
-                <PopularNodeBadge key={pubkey} pubkey={pubkey} />
+                <AnimatePresence key={pubkey}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <PopularNodeBadge key={pubkey} pubkey={pubkey} />
+                  </motion.div>
+                </AnimatePresence>
               ))}
               <div className="sm:col-span-3 flex flex-col sm:flex-row justify-center gap-y-2 gap-x-6">
                 {popularNodes.slice(3).map((pubkey) => (
-                  <PopularNodeBadge key={pubkey} pubkey={pubkey} />
+                  <AnimatePresence key={pubkey}>
+                    <motion.div
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <PopularNodeBadge key={pubkey} pubkey={pubkey} />
+                    </motion.div>
+                  </AnimatePresence>
                 ))}{" "}
               </div>
             </div>
