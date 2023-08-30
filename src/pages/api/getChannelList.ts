@@ -1,4 +1,4 @@
-import { ChannelInfoResponse } from "@/components/data-table";
+import { ChannelInfoResponse, PAGE_SIZE } from "@/components/data-table";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type Data = {
@@ -20,7 +20,7 @@ export type Data = {
               long_channel_id: string;
               node1_pub: string;
               node2_pub: string;
-              node2_policy: {
+              node2_policy?: {
                 disabled: boolean;
               };
               node2_info: {
@@ -58,7 +58,7 @@ function mapApiResponse(data: Data): ChannelInfoResponse {
       id: node2_pub,
       pubkey: node2_pub,
       alias: node2_info.node.alias,
-      disabled: node2_policy.disabled,
+      disabled: node2_policy?.disabled,
       capacity: Number(capacity),
       shortChannelId: short_channel_id,
     };
@@ -78,7 +78,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
-  const { pubkey } = req.query;
+  const { pubkey, pageIndex } = req.query as unknown as {
+    pubkey: string;
+    pageIndex: string;
+  };
+
+  const pageIndexNumber = Number(pageIndex);
 
   const query = `
     query Pagination($pubkey: String!, $page: PageInput, $order: OrderChannelInput) {
@@ -125,8 +130,8 @@ export default async function handler(
   const variables = {
     pubkey,
     page: {
-      limit: 10,
-      offset: 0,
+      limit: PAGE_SIZE,
+      offset: 10 * pageIndexNumber,
     },
     order: {
       by: "capacity",

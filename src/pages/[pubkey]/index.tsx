@@ -17,10 +17,13 @@ function formatLastUpdate(lastUpdate: string | undefined) {
 
 export default function Pubkey() {
   const router = useRouter();
-  const { pubkey } = router.query as { pubkey: string };
+  const { pubkey, page = 0 } = router.query;
 
-  const { data, isLoading } = useChannelList(pubkey);
-  const { totalCapacity, numChannels, lastUpdate, channels, alias } =
+  const { data, isLoading } = useChannelList(
+    pubkey as string | undefined,
+    Number(page)
+  );
+  const { totalCapacity, numChannels, lastUpdate, alias, channels } =
     data || {};
 
   return (
@@ -33,7 +36,7 @@ export default function Pubkey() {
         Back to Home
       </Link>
 
-      <div className="max-w-6xl py-10 sm:py-20 mx-auto bg-slate-800 min-h-full px-10">
+      <div className="max-w-6xl py-10 sm:py-20 mx-auto bg-slate-800/50 min-h-full px-10">
         <p className="text-slate-400 font-medium text-md">Lightning Node</p>
         {isLoading ? (
           <div className="h-8 my-1 w-36 bg-slate-500 animate-pulse" />

@@ -7,13 +7,16 @@ import {
 } from "@tanstack/react-table";
 import cn from "classnames";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { ArrowLeftIcon } from "./icons/arrow-left";
+import { PaginationButton } from "./pagination-button";
 import { StatusChip } from "./status-chip";
 
 export type ChannelInfo = {
   id: string;
   pubkey: string;
   alias: string;
-  disabled: boolean;
+  disabled?: boolean;
   capacity: number;
   shortChannelId: string;
 };
@@ -78,13 +81,33 @@ type DataTableProps = {
 };
 
 const emptyArray: ChannelInfo[] = [];
+export const PAGE_SIZE = 10;
 
 export function DataTable({ data, isLoading }: DataTableProps) {
+  const router = useRouter();
+  const { page: pageQuery } = router.query;
+  const page = Number(pageQuery) || 0;
+
   const table = useReactTable({
     data: data || emptyArray,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    pageCount: -1,
+    manualPagination: true,
   });
+
+  function handlePageChange(direction: "next" | "prev") {
+    const updatedPage = direction === "next" ? page + 1 : page - 1;
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: updatedPage },
+      },
+      undefined,
+      { scroll: false }
+    );
+  }
 
   return (
     <div className="w-full">
@@ -140,35 +163,32 @@ export function DataTable({ data, isLoading }: DataTableProps) {
                 }
               >
                 {[...new Array(5)].map((_, index) => (
-                  <td key={index} className="w-40 my-2 h-10" />
+                  <td key={index} className="w-40 my-2 h-12" />
                 ))}
               </tr>
             ))}
           </tbody>
         )}
       </table>
-      {/* <div className="flex items-center justify-end space-x-2 py-4"> */}
-      {/*   <div className="flex-1 text-sm text-white"> */}
-      {/*     {table.getFilteredSelectedRowModel().rows.length} of{" "} */}
-      {/*     {table.getFilteredRowModel().rows.length} row(s) selected. */}
-      {/*   </div> */}
-      {/*   <div className="space-x-2"> */}
-      {/*     <button */}
-      {/*       className="text-white" */}
-      {/*       onClick={() => table.previousPage()} */}
-      {/*       disabled={!table.getCanPreviousPage()} */}
-      {/*     > */}
-      {/*       Previous */}
-      {/*     </button> */}
-      {/*     <button */}
-      {/*       className="text-white" */}
-      {/*       onClick={() => table.nextPage()} */}
-      {/*       disabled={!table.getCanNextPage()} */}
-      {/*     > */}
-      {/*       Next */}
-      {/*     </button> */}
-      {/*   </div> */}
-      {/* </div> */}
+      <div className="flex items-center text-md justify-end space-x-2 py-8">
+        <div className="flex-1 text-white">Page {page + 1}</div>
+        <div className="flex items-center space-x-6">
+          <PaginationButton
+            onClick={() => handlePageChange("prev")}
+            disabled={!data || page < 1}
+          >
+            <ArrowLeftIcon className="w-4 h-4 mr-1" />
+            Prev
+          </PaginationButton>
+          <PaginationButton
+            onClick={() => handlePageChange("next")}
+            disabled={!data || data.length < PAGE_SIZE}
+          >
+            Next
+            <ArrowLeftIcon className="w-4 h-4 ml-1 mt-0.5 rotate-180" />
+          </PaginationButton>
+        </div>
+      </div>
     </div>
   );
 }
