@@ -19,13 +19,33 @@ export default function Pubkey() {
   const router = useRouter();
   const { pubkey, page = 0 } = router.query;
 
-  const { data, isLoading } = useChannelList(
+  const { data, isLoading, isError } = useChannelList(
     pubkey as string | undefined,
     Number(page)
   );
 
   const { totalCapacity, numChannels, lastUpdate, alias, channels } =
     data || {};
+
+  if (isError) {
+    return (
+      <main className="w-screen relative h-screen mx-auto max-w-5xl">
+        <div className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6">
+          <h1 className="text-lg md:text-3xl text-center text-slate-200 overflow-hidden">
+            Unable to find Node with Public Key:{" "}
+            <span className="text-blue-400 break-words">{pubkey}</span>
+          </h1>
+          <p className="text-slate-200 mt-6 md:mt-10 text-md md:text-xl text-center">
+            Please go
+            <Link href="/" className="text-indigo-400 px-2">
+              back
+            </Link>
+            and try a different one.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative h-full">

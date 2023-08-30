@@ -5,6 +5,11 @@ async function fetchNodeInfo(
   pubkey: string | undefined
 ): Promise<GetNodeInfoResponseType> {
   const res = await fetch(`/api/getNodeInfo?pubkey=${pubkey}`);
+
+  if (!res.ok) {
+    throw new Error("Network response was not ok");
+  }
+
   return await res.json();
 }
 

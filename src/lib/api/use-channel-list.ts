@@ -8,6 +8,11 @@ async function fetchChannels(
   const res = await fetch(
     `/api/getChannelList?pubkey=${pubkey}&pageIndex=${pageIndex}`
   );
+
+  if (!res.ok) {
+    throw new Error("Network response was not ok");
+  }
+
   return await res.json();
 }
 
