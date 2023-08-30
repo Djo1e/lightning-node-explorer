@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 ##
-This is a Lightning Node Explorer. You can use it to search for a Lightning node by Public Key. It displays various information about the node, such as **alias**, **capacity** and **active channels**. If you don't know a Public Key, you can click on one of the **popular nodes** under the search.
+This is a Lightning Node Explorer. You can use it to search for a Lightning node by Public Key. It displays various information about the node, such as **alias**, **capacity** and **active channels**. If you don't know any node public keys, you can click on one of the **popular nodes** under the search.
 
 Tech-stack:
 - Next.js
