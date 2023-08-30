@@ -73,19 +73,7 @@ function mapApiResponse(data: Data): ChannelInfoResponse {
   };
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
-  const { pubkey, pageIndex } = req.query as unknown as {
-    pubkey: string;
-    pageIndex: string;
-  };
-
-  const pageIndexNumber = Number(pageIndex);
-
-  const query = `
+const query = `
     query Pagination($pubkey: String!, $page: PageInput, $order: OrderChannelInput) {
       getNode(pubkey: $pubkey) {
         graph_info {
@@ -126,6 +114,18 @@ export default async function handler(
       }
     }
   `;
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const GRAPHQL_ENDPOINT = "https://api.amboss.space/graphql";
+  const { pubkey, pageIndex } = req.query as unknown as {
+    pubkey: string;
+    pageIndex: string;
+  };
+
+  const pageIndexNumber = Number(pageIndex);
 
   const variables = {
     pubkey,

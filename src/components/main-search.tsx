@@ -18,7 +18,7 @@ export function MainSearch({ value, setValue }: MainSearchProps) {
         </span>
       </div>
       <button
-        className="px-8 mt-2 py-2 sm:mt-0 bg-blue-500 text-white rounded sm:rounded-l-none text-lg"
+        className="px-8 mt-2 py-2 sm:mt-0 bg-indigo-500 text-white rounded sm:rounded-l-none text-lg"
         type="submit"
       >
         Search
